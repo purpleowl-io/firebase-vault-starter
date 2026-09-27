@@ -34,9 +34,21 @@ const rl = createInterface({ input: process.stdin, output: process.stdout })
 const lines = []
 const waiting = []
 rl.on('line', (line) => (waiting.length ? waiting.shift()(line) : lines.push(line)))
-rl.on('close', () => waiting.splice(0).forEach((resolve) => resolve('')))
+// If input ends (Ctrl+D, or a script ran out of answers), stop rather than guess.
+let inputEnded = false
+rl.on('close', () => {
+  inputEnded = true
+  if (waiting.length) {
+    console.log(red('\n\nSetup stopped: no answer given. Run `npm run setup` again when ready.'))
+    process.exit(1)
+  }
+})
 const ask = async (question, fallback = '') => {
   process.stdout.write(`${question}${fallback ? dim(` [${fallback}]`) : ''} `)
+  if (!lines.length && inputEnded) {
+    console.log(red('\n\nSetup stopped: no answer given. Run `npm run setup` again when ready.'))
+    process.exit(1)
+  }
   const line = lines.length ? lines.shift() : await new Promise((resolve) => waiting.push(resolve))
   const answer = line.trim()
   if (!process.stdin.isTTY) process.stdout.write(`${answer}\n`)
@@ -59,7 +71,7 @@ function manual(title, lines, doc) {
 
 // Run the Firebase CLI and return its --json result.
 function firebaseJson(args) {
-  const run = spawnSync(process.execPath, [firebaseBin, ...args, '--json', '--non-interactive'], {
+  const run = spawnSync(process.execPath, ['--no-deprecation', firebaseBin, ...args, '--json', '--non-interactive'], {
     cwd: root,
     encoding: 'utf8',
   })
@@ -76,7 +88,7 @@ function firebaseJson(args) {
 // Run the Firebase CLI with its normal output shown to the person.
 function firebaseLive(args) {
   return new Promise((resolve) => {
-    const child = spawn(process.execPath, [firebaseBin, ...args], { cwd: root, stdio: 'inherit' })
+    const child = spawn(process.execPath, ['--no-deprecation', firebaseBin, ...args], { cwd: root, stdio: 'inherit' })
     child.on('exit', (code) => resolve(code === 0))
   })
 }
@@ -188,8 +200,14 @@ async function main() {
   let projectId = readProjectId()
   if (projectId && !(await yes(`  This folder is already connected to ${bold(projectId)}. Keep using it?`))) projectId = null
   if (!projectId) {
-    const reuse = await yes('  Create a brand-new Firebase project for this app? (answer n to pick one you already have)')
-    if (reuse) {
+    // No default here: creating a project should always be a deliberate "y".
+    let createNew
+    while (createNew === undefined) {
+      const answer = (await ask('  Create a brand-new Firebase project for this app? Type y, or n to pick one you already have:')).toLowerCase()
+      if (answer.startsWith('y')) createNew = true
+      else if (answer.startsWith('n')) createNew = false
+    }
+    if (createNew) {
       const name = await ask('  What should the project be called?', 'My Vault')
       projectId = makeProjectId(name)
       info(`Creating ${bold(projectId)}. This takes about a minute…`)

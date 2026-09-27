@@ -9,7 +9,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "setup": "node scripts/setup.mjs",
+    "setup": "node --no-deprecation scripts/setup.mjs",
     "dev": "firebase emulators:exec --project demo-vault --only auth,firestore --ui \"vite\"",
     "test:rules": "firebase emulators:exec --project demo-vault --only firestore \"vitest run --reporter=verbose\"",
     "build": "vite build",
