@@ -1,1 +1,124 @@
-body { font-family: system-ui, sans-serif; }
+/* All the styling for the app, in one file. */
+
+:root {
+  --ink: #1f2330;
+  --muted: #5f6577;
+  --line: #dfe2ea;
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --accent: #5b3fd1;
+  --accent-dark: #4630a8;
+  --danger: #b42318;
+  --warn-bg: #fff4cc;
+  --warn-ink: #6b4e00;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.5;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+
+.banner {
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+  text-align: center;
+  padding: 0.4rem 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #f0dc8a;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 0.5rem;
+}
+.top h1 { font-size: 1.4rem; margin: 0; }
+.who { display: flex; align-items: center; gap: 0.75rem; color: var(--muted); font-size: 0.9rem; }
+
+.page { max-width: 44rem; margin: 0 auto; padding: 0.5rem 1rem 3rem; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+.card h2 { margin-top: 0; font-size: 1.15rem; }
+
+label { display: block; font-weight: 600; margin-bottom: 0.35rem; }
+input[type='email'], input[type='text'], textarea {
+  width: 100%;
+  font: inherit;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+textarea { min-height: 4.5rem; resize: vertical; }
+input:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+.row { display: flex; gap: 0.5rem; }
+.row input { flex: 1; }
+
+button {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+}
+button:hover { background: var(--accent-dark); }
+button:disabled { opacity: 0.6; cursor: default; }
+button.secondary { background: #fff; color: var(--ink); border-color: var(--line); }
+button.secondary:hover { background: var(--bg); }
+button.danger { background: #fff; color: var(--danger); border-color: var(--line); }
+button.danger:hover { background: #fdecea; }
+button.link { background: none; border: none; color: var(--accent); padding: 0; text-decoration: underline; }
+button.google { width: 100%; background: #fff; color: var(--ink); border-color: var(--line); }
+button.google:hover { background: var(--bg); }
+
+.divider { display: flex; align-items: center; gap: 0.75rem; color: var(--muted); margin: 1.25rem 0; font-size: 0.85rem; }
+.divider::before, .divider::after { content: ''; flex: 1; border-top: 1px solid var(--line); }
+
+.notice { background: var(--bg); border-radius: 8px; padding: 0.75rem 1rem; }
+.notice p { margin: 0 0 0.5rem; }
+.error {
+  color: var(--danger);
+  background: #fdecea;
+  border: 1px solid #f5c2bd;
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+}
+code { background: var(--bg); padding: 0.1rem 0.3rem; border-radius: 4px; font-size: 0.9em; }
+
+/* Items */
+.add { display: grid; gap: 0.6rem; }
+.add .actions, .item .actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
+.items { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: 0.6rem; }
+.item {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+.item-main { display: flex; gap: 0.75rem; align-items: flex-start; }
+.item-main input[type='checkbox'] { width: 1.15rem; height: 1.15rem; margin-top: 0.2rem; accent-color: var(--accent); }
+.item-text { flex: 1; min-width: 0; }
+.item-title { font-weight: 600; overflow-wrap: anywhere; }
+.item.done .item-title { text-decoration: line-through; color: var(--muted); }
+.item-notes { color: var(--muted); white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 0.15rem; }
+.empty { color: var(--muted); text-align: center; padding: 1.5rem 0; }
