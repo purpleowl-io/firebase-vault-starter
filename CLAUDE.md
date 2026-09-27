@@ -19,6 +19,12 @@ are the vault door. Everything else is decoration. Treat them that way.
 - `src/firebase.js`: the only file that initializes Firebase; switches to emulators in development.
 - `src/auth.js`: sign-in and sign-out. `src/items.js`: every Firestore read and write for items.
 - `docs/EXTENDING.md`: the order to follow when adding a new record type (spine, rules, failing tests, passing tests, then screen).
+- `scripts/setup.mjs` (`npm run setup`): creates and configures the real Firebase project for the owner. Only run it when asked; it creates cloud resources. Never answer its prompts on the owner's behalf.
+
+## Running things
+
+- The emulators need **Java 21 or newer** (`java -version`). An older Java fails with "firebase-tools no longer supports Java version before 21".
+- `npm run test:rules` and `npm run dev` both start emulators on the same ports. Stop one before starting the other, or you'll get "port taken".
 
 ## Out of scope
 
