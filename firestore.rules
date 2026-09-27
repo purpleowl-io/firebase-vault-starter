@@ -1,10 +1,62 @@
 rules_version = '2';
 
-// Placeholder: deny everything. The real rules arrive with their tests.
+// The vault door. Anything not explicitly allowed below is denied.
+// Every rule here is proven by a test in tests/firestore.rules.test.js.
+// Change a rule only together with the test that proves it.
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
+
+    // Ownership is the path: you may only touch the folder with your own id on it.
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // A profile holds only what the app needs, so nothing else can be stored or leaked.
+    function validProfile(data) {
+      return data.keys().hasOnly(['displayName', 'email', 'createdAt'])
+        && data.keys().hasAll(['displayName', 'email', 'createdAt'])
+        && data.displayName is string && data.displayName.size() <= 200
+        && data.email is string && data.email.size() <= 320
+        && data.createdAt is timestamp;
+    }
+
+    // An item has exactly these fields, with types and size limits, so no one can stuff in extra data.
+    function validItem(data) {
+      return data.keys().hasOnly(['title', 'notes', 'done', 'createdAt', 'updatedAt'])
+        && data.keys().hasAll(['title', 'notes', 'done', 'createdAt', 'updatedAt'])
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 200
+        && data.notes is string && data.notes.size() <= 5000
+        && data.done is bool
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // Timestamps come from the server clock, so a user can't backdate or forge them.
+    function stampedNow(field) {
+      return request.resource.data[field] == request.time;
+    }
+
+    // createdAt is set once and never rewritten, so history can't be altered.
+    function createdAtUnchanged() {
+      return request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    // One folder per person.
+    match /users/{uid} {
+      allow get: if isOwner(uid);
+      allow create: if isOwner(uid) && validProfile(request.resource.data) && stampedNow('createdAt');
+      allow update: if isOwner(uid) && validProfile(request.resource.data) && createdAtUnchanged();
+
+      // Items filed inside that person's folder.
+      match /items/{itemId} {
+        allow get, list: if isOwner(uid);
+        allow create: if isOwner(uid) && validItem(request.resource.data)
+          && stampedNow('createdAt') && stampedNow('updatedAt');
+        allow update: if isOwner(uid) && validItem(request.resource.data)
+          && createdAtUnchanged() && stampedNow('updatedAt');
+        allow delete: if isOwner(uid);
+      }
     }
   }
 }
