@@ -10,7 +10,7 @@ import {
   signOut,
 } from 'firebase/auth'
 import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
-import { auth, db } from './firebase.js'
+import { auth, db, usingEmulators } from './firebase.js'
 
 // Remember which email asked for a link, so the person doesn't retype it when they click it.
 const EMAIL_KEY = 'emailForSignIn'
@@ -25,6 +25,15 @@ export async function sendSignInLink(email) {
     handleCodeInApp: true,
   })
   window.localStorage.setItem(EMAIL_KEY, email)
+}
+
+// Local test mode only: no email is really sent, so ask the Auth emulator for the
+// link it would have emailed. Never runs against a real project.
+export async function testModeSignInLink(email) {
+  if (!usingEmulators) return null
+  const res = await fetch('http://127.0.0.1:9099/emulator/v1/projects/demo-vault/oobCodes')
+  const { oobCodes = [] } = await res.json()
+  return oobCodes.filter((c) => c.email === email && c.requestType === 'EMAIL_SIGNIN').at(-1)?.oobLink ?? null
 }
 
 export function isSignInLink() {

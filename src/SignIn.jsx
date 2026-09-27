@@ -5,6 +5,7 @@ import {
   sendSignInLink,
   signInWithGoogle,
   storedEmail,
+  testModeSignInLink,
 } from './auth.js'
 import { readableError, usingEmulators } from './firebase.js'
 
@@ -12,6 +13,7 @@ export default function SignIn() {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState('idle') // idle | sending | sent | confirm | finishing
   const [error, setError] = useState('')
+  const [testLink, setTestLink] = useState(null)
   const started = useRef(false)
 
   // If we arrived here by clicking an emailed link, finish signing in.
@@ -41,6 +43,7 @@ export default function SignIn() {
     try {
       await sendSignInLink(email.trim())
       setStatus('sent')
+      if (usingEmulators) setTestLink(await testModeSignInLink(email.trim()).catch(() => null))
     } catch (e) {
       setError(readableError(e))
       setStatus('idle')
@@ -85,9 +88,8 @@ export default function SignIn() {
           <p>Check your email. We sent a sign-in link to <strong>{email}</strong>.</p>
           {usingEmulators && (
             <p>
-              Local test mode: no real email is sent. Open the{' '}
-              <a href="http://127.0.0.1:4000/auth" target="_blank" rel="noreferrer">emulator page</a>{' '}
-              or look in the terminal running <code>npm run dev</code> for the link.
+              Local test mode: no real email is sent.{' '}
+              {testLink ? <a href={testLink}>Open the sign-in link</a> : 'The link is in the terminal running npm run dev.'}
             </p>
           )}
           <button className="link" onClick={() => setStatus('idle')}>Use a different email</button>
