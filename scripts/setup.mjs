@@ -362,9 +362,9 @@ async function main() {
   }
 
   console.log(`\n${green(bold('All set.'))}`)
-  console.log(`  Your app:        ${siteUrl}`)
-  console.log(`  Firebase console: https://console.firebase.google.com/project/${projectId}`)
-  console.log(`  Build locally:   npm run dev   (uses test data only, never the real project)`)
+  console.log(`  Your app:          ${siteUrl}`)
+  console.log(`  Firebase console:  https://console.firebase.google.com/project/${projectId}`)
+  console.log(`  Build locally:     npm run dev   (uses test data only, never the real project)`)
   console.log(dim('\n  Heads up: on the free plan Firebase sends at most 5 sign-in emails a day.'))
   console.log(dim('  Google sign-in has no such limit. See docs/SETUP.md#the-5-emails-a-day-limit.'))
 }
