@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.firebase/
+
+# Environment files hold your project's config. Only the empty example is committed.
+.env*
+!.env.example
+
+# Emulator logs
+*-debug.log
+firebase-debug.*.log
+ui-debug.log
+
+.DS_Store

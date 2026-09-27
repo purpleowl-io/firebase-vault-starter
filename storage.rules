@@ -1,0 +1,11 @@
+rules_version = '2';
+
+// Storage is not used by this starter. Everything is denied so that if you
+// turn Storage on later, it starts locked. Write rules and tests before opening it.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
