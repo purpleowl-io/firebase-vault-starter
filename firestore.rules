@@ -7,9 +7,15 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Ownership is the path: you may only touch the folder with your own id on it.
+    // Ownership is the path: you may only touch the folder with your own id on it,
+    // and only after proving you own your email address.
     function isOwner(uid) {
-      return request.auth != null && request.auth.uid == uid;
+      return request.auth != null && request.auth.uid == uid && hasProvenEmail();
+    }
+
+    // Email link and Google prove the address; a password account someone made in your name doesn't.
+    function hasProvenEmail() {
+      return request.auth.token.email_verified == true;
     }
 
     // A profile holds only what the app needs, so nothing else can be stored or leaked.

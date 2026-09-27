@@ -23,15 +23,23 @@ import {
   getDocs,
   serverTimestamp,
   setDoc,
+  setLogLevel,
   updateDoc,
 } from 'firebase/firestore'
 
+// Many tests expect a refusal; don't print Firebase's log line for each one.
+setLogLevel('silent')
+
 let env
 
-// Alice and Bob are two ordinary signed-in users.
-const alice = () => env.authenticatedContext('alice').firestore()
-const bob = () => env.authenticatedContext('bob').firestore()
+// Alice and Bob are two ordinary signed-in users. Signing in by email link or
+// Google proves they own their email address, so their tokens say email_verified.
+const alice = () => env.authenticatedContext('alice', { email: 'alice@example.com', email_verified: true }).firestore()
+const bob = () => env.authenticatedContext('bob', { email: 'bob@example.com', email_verified: true }).firestore()
 const stranger = () => env.unauthenticatedContext().firestore()
+// Someone who created a password account with Alice's address but never proved they own it.
+const unprovenAlice = () =>
+  env.authenticatedContext('alice', { email: 'alice@example.com', email_verified: false }).firestore()
 
 // A valid new item, stamped with the server clock as the rules require.
 const newItem = (overrides = {}) => ({
@@ -287,5 +295,25 @@ describe('9. Everything else is locked', () => {
   test('an unknown folder inside your own profile is still locked', async () => {
     await assertFails(setDoc(doc(alice(), 'users/alice/secrets/s1'), { anything: true }))
     await assertFails(getDocs(collection(alice(), 'users/alice/secrets')))
+  })
+})
+
+describe('10. An unproven email opens nothing', () => {
+  // Firebase lets anyone create a password account for any address, even though this
+  // app never shows a password box. Only an email link or Google proves the address.
+  test('someone who hasn’t proven they own the email address cannot read the items in that folder', async () => {
+    await assertFails(getDoc(doc(unprovenAlice(), 'users/alice/items/a1')))
+    await assertFails(getDocs(collection(unprovenAlice(), 'users/alice/items')))
+    await assertFails(getDoc(doc(unprovenAlice(), 'users/alice')))
+  })
+
+  test('someone who hasn’t proven they own the email address cannot add, change, or delete anything', async () => {
+    await assertFails(addDoc(collection(unprovenAlice(), 'users/alice/items'), newItem()))
+    await assertFails(
+      updateDoc(doc(unprovenAlice(), 'users/alice/items/a1'), { title: 'Planted', updatedAt: serverTimestamp() })
+    )
+    await assertFails(deleteDoc(doc(unprovenAlice(), 'users/alice/items/a1')))
+    await env.clearFirestore()
+    await assertFails(setDoc(doc(unprovenAlice(), 'users/alice'), newProfile()))
   })
 })
