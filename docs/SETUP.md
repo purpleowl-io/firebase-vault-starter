@@ -62,7 +62,9 @@ Then install the app's building blocks:
 npm install
 ```
 
-**You should see** it finish with something like `added 700 packages` and no red `ERR!` lines. Warnings in yellow are normal.
+**You should see** it finish with something like `added 750 packages` and no red `ERR!` lines.
+
+It may also say `5 moderate severity vulnerabilities` and suggest `npm audit fix --force`. **Don't run that.** The warnings are about libraries inside Firebase's own command-line tools, which only run on your computer and aren't part of the app people use. The suggested "fix" installs an older version of those tools that breaks setup. They go away when Firebase updates its tools.
 
 ## 4. Try it on your computer
 
