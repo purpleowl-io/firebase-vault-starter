@@ -46,16 +46,16 @@ export default function ItemList({ user }) {
 function AddItem({ onAdd }) {
   const [title, setTitle] = useState('')
   const [notes, setNotes] = useState('')
-  const [saving, setSaving] = useState(false)
-
+  // Clear the form straight away so the next item can be typed while this one saves.
+  // If saving fails, put the text back so nothing is lost.
   async function submit(event) {
     event.preventDefault()
-    setSaving(true)
-    const ok = await onAdd({ title, notes })
-    setSaving(false)
-    if (ok) {
-      setTitle('')
-      setNotes('')
+    const fields = { title, notes }
+    setTitle('')
+    setNotes('')
+    if (!(await onAdd(fields))) {
+      setTitle(fields.title)
+      setNotes(fields.notes)
     }
   }
 
@@ -67,7 +67,7 @@ function AddItem({ onAdd }) {
       <textarea aria-label="Notes" maxLength={NOTES_MAX} value={notes}
         onChange={(e) => setNotes(e.target.value)} placeholder="Notes (optional)" />
       <div className="actions">
-        <button type="submit" disabled={saving || !title.trim()}>{saving ? 'Adding…' : 'Add'}</button>
+        <button type="submit" disabled={!title.trim()}>Add</button>
       </div>
     </form>
   )
