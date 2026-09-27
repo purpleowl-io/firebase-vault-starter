@@ -14,7 +14,7 @@
     "test:rules": "firebase emulators:exec --project demo-vault --only firestore \"vitest run --reporter=verbose\"",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "vite build && firebase deploy --only hosting,firestore:rules,storage"
+    "deploy": "vite build && firebase deploy --only hosting,firestore:rules"
   },
   "dependencies": {
     "firebase": "^12.19.0",
