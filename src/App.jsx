@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ensureProfile, signOutUser, watchUser } from './auth.js'
 import { readableError, usingEmulators } from './firebase.js'
+import ItemList from './ItemList.jsx'
 import SignIn from './SignIn.jsx'
 
 export default function App() {
@@ -37,7 +38,7 @@ export default function App() {
         {error && <p className="error">{error}</p>}
         {user === undefined && <p>Loading…</p>}
         {user === null && <SignIn />}
-        {user && <p>Signed in.</p>}
+        {user && <ItemList user={user} />}
       </main>
     </>
   )

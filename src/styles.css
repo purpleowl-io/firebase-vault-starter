@@ -112,13 +112,16 @@ code { background: var(--bg); padding: 0.1rem 0.3rem; border-radius: 4px; font-s
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 0.9rem 1rem;
-  display: grid;
-  gap: 0.5rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
 }
-.item-main { display: flex; gap: 0.75rem; align-items: flex-start; }
+.item > form { flex: 1; }
+.item-main { flex: 1; display: flex; gap: 0.75rem; align-items: flex-start; min-width: 0; }
 .item-main input[type='checkbox'] { width: 1.15rem; height: 1.15rem; margin-top: 0.2rem; accent-color: var(--accent); }
 .item-text { flex: 1; min-width: 0; }
 .item-title { font-weight: 600; overflow-wrap: anywhere; }
 .item.done .item-title { text-decoration: line-through; color: var(--muted); }
+.item .actions button { padding: 0.35rem 0.75rem; font-size: 0.9rem; }
 .item-notes { color: var(--muted); white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 0.15rem; }
 .empty { color: var(--muted); text-align: center; padding: 1.5rem 0; }
